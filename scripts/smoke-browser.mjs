@@ -65,7 +65,7 @@ try {
   await tap('[data-pick="AH57-weight"]'); await evaluate('document.querySelector("#picker-number").value=120'); await tap('#picker button[value="cancel"]');
   assert.equal(await evaluate('document.querySelector("[data-backoff-label=AH57]").textContent'), '85 kg');
   // Exercise all 48 views and their responsive details.
-  for (let week = 1; week <= 12; week++) for (let day = 1; day <= 4; day++) { await go(`#/workout/${week}/${day}`); assert.ok(await evaluate('document.querySelectorAll("article").length>0')); await evaluate('document.querySelectorAll("details").forEach(d=>d.open=true)'); assert.ok(await evaluate('document.documentElement.scrollWidth <= innerWidth'), `${week}/${day} overflow`); }
+  for (let week = 1; week <= 12; week++) for (let day = 1; day <= 4; day++) { await go(`#/workout/${week}/${day}`); assert.ok(await evaluate('document.querySelectorAll("article").length>0')); await evaluate('document.querySelectorAll("details").forEach(d=>d.open=true)'); assert.ok(await evaluate('!/excel/i.test(document.body.innerText)')); assert.ok(await evaluate('document.documentElement.scrollWidth <= innerWidth'), `${week}/${day} overflow`); }
   // Finish a minimal source test session through actual UI, then change TM.
   await go('#/workout/12/1');
   await tap('[data-pick="BG57-weight"]'); await evaluate('document.querySelector("#picker-number").value=110'); await tap('#picker-confirm');
@@ -97,6 +97,12 @@ try {
     await evaluate(`document.querySelector('#theme-select').value=${JSON.stringify(theme)};document.querySelector('#theme-select').dispatchEvent(new Event('change'))`);
     assert.equal(await evaluate('document.body.dataset.theme'), theme);
     assert.equal(await evaluate('document.querySelector("#music-toggle").getAttribute("aria-pressed")'), 'false');
+    for (const [route, heading] of [['home', 'Programa'], ['setup', 'Mis marcas'], ['history', 'Historial'], ['guide', 'Guía del programa']]) {
+      await go('#/' + route);
+      assert.equal(await evaluate('document.querySelector("h1").textContent'), heading, theme + '/' + route + ' functional heading');
+      assert.ok(await evaluate('!/excel/i.test(document.body.innerText)'), theme + '/' + route + ' functional copy');
+      assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'), theme + '/' + route + ' mobile width');
+    }
     await go('#/workout/1/4');
     assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'), theme + ' mobile workout');
     const contrast = await evaluate(`(()=>{
