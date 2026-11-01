@@ -57,6 +57,16 @@ try {
   await evaluate('window.scrollTo(0,0);document.querySelector("#status").classList.remove("visible")');
   await screenshot('repbase-sesion-mobile.png');
   await tap('[data-pick="D57-weight"]'); await screenshot('repbase-selector-mobile.png'); await tap('#picker button[value="cancel"]');
+  await evaluate('document.querySelector("article").scrollIntoView({block:"start"})');
+  await screenshot('repbase-rm-controls-mobile.png');
+  await evaluate('document.querySelector("article .exercise-help").open=true;document.querySelector("article .exercise-help").scrollIntoView({block:"start"})');
+  await screenshot('repbase-rm-help-mobile.png');
+  await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+  await evaluate('document.querySelector("article").scrollIntoView({block:"start"})');
+  await screenshot('repbase-rm-help-desktop.png');
+  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+  await tap('[data-pick="D57-weight"]'); await evaluate('document.querySelector("#picker-number").value=95'); await tap('#picker-confirm');
+  assert.equal(await evaluate('document.querySelector("article .exercise-help").open'),true,'help stays open after recording a weight');
   // Same-day RM changes live backoffs; cancellation never commits.
   await go('#/workout/7/1');
   assert.ok(await evaluate('document.querySelector("[data-backoff-label=AH57]").textContent.includes("Sin definir")'));
@@ -64,6 +74,13 @@ try {
   assert.equal(await evaluate('document.querySelector("[data-backoff-label=AH57]").textContent'), '85 kg');
   await tap('[data-pick="AH57-weight"]'); await evaluate('document.querySelector("#picker-number").value=120'); await tap('#picker button[value="cancel"]');
   assert.equal(await evaluate('document.querySelector("[data-backoff-label=AH57]").textContent'), '85 kg');
+  await tap('[data-pick="AH57-weight"]');
+  await evaluate('document.querySelector("#picker-number").value=140');
+  await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+  await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+  await until('!document.querySelector("#picker").open');
+  assert.equal(await evaluate('document.querySelector("[data-backoff-label=AH57]").textContent'),'85 kg','Escape discards after a prior confirmed edit');
+  assert.equal(await evaluate('document.activeElement.dataset.pick'),'AH57-weight','dialog returns focus to its control');
   // Exercise all 48 views and their responsive details.
   for (let week = 1; week <= 12; week++) for (let day = 1; day <= 4; day++) { await go(`#/workout/${week}/${day}`); assert.ok(await evaluate('document.querySelectorAll("article").length>0')); await evaluate('document.querySelectorAll("details").forEach(d=>d.open=true)'); assert.ok(await evaluate('!/excel/i.test(document.body.innerText)')); assert.ok(await evaluate('document.documentElement.scrollWidth <= innerWidth'), `${week}/${day} overflow`); }
   // Finish a minimal source test session through actual UI, then change TM.
@@ -112,13 +129,40 @@ try {
       const card=getComputedStyle(document.querySelector('article'));
       const muted=getComputedStyle(document.querySelector('article .muted'));
       const input=getComputedStyle(document.querySelector('article input'));
-      const button=getComputedStyle(document.querySelector('#music-toggle'));
-      return {body:ratio(card.color,card.backgroundColor),muted:ratio(muted.color,card.backgroundColor),input:ratio(input.color,input.backgroundColor),button:ratio(button.color,button.backgroundColor)};
+      const buttonNode=document.querySelector('#music-toggle');const button=getComputedStyle(buttonNode);
+      const background=node=>{for(let n=node;n;n=n.parentElement){const c=getComputedStyle(n).backgroundColor;if(c!=='rgba(0, 0, 0, 0)'&&c!=='transparent')return c;}return 'rgb(255, 255, 255)';};
+      return {body:ratio(card.color,card.backgroundColor),muted:ratio(muted.color,card.backgroundColor),input:ratio(input.color,input.backgroundColor),button:ratio(button.color,background(buttonNode))};
     })()`);
     for (const [label, value] of Object.entries(contrast)) assert.ok(value>=4.5, `${theme}/${label}: ${value}`);
+    // Contextual help must be usable and reversible without changing a log.
+    await tap('article .exercise-help summary');
+    assert.ok(await evaluate('document.querySelector("article .exercise-help").open'));
+    assert.ok(await evaluate('document.querySelector("article .exercise-help").innerText.includes("aproximación")'));
+    assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'));
+    await tap('article .exercise-help summary');
+    assert.equal(await evaluate('document.querySelector("article .exercise-help").open'), false);
+    const smallTargets=await evaluate('[...document.querySelectorAll("article button")].filter(b=>{const r=b.getBoundingClientRect();return r.width<44||r.height<44;}).length');
+    assert.equal(smallTargets,0,theme+' workout touch targets');
+    const beforeDismissal=await evaluate('localStorage.getItem("jacked-and-tan-v1")');
     await tap('[data-pick="D93-weight"]');
     assert.ok(await evaluate('document.documentElement.scrollWidth<=innerWidth'), theme + ' dialog');
+    await evaluate('document.querySelector("#picker-number").value=140');
+    await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+    await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+    await until('!document.querySelector("#picker").open');
+    assert.equal(await evaluate('localStorage.getItem("jacked-and-tan-v1")'),beforeDismissal,theme+' Escape preserves records');
+    await tap('[data-pick="D93-weight"]');
+    await evaluate('document.querySelector("#picker-number").value=150');
+    await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:2,y:2}]});
+    await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await until('!document.querySelector("#picker").open');
+    assert.equal(await evaluate('localStorage.getItem("jacked-and-tan-v1")'),beforeDismissal,theme+' backdrop preserves records');
+    await tap('[data-pick="D93-weight"]');
+    await evaluate('document.querySelector("#picker-number").value=0');
+    await tap('#picker-confirm');
+    assert.equal(await evaluate('document.querySelector("#picker").open'),true,'invalid weight stays in dialog');
     await tap('#picker button[value="cancel"]');
+    assert.equal(await evaluate('localStorage.getItem("jacked-and-tan-v1")'),beforeDismissal,theme+' invalid edit cancellation');
     await tap('#music-toggle'); await until('document.querySelector("#music-toggle").getAttribute("aria-pressed")==="true"');
     assert.equal(await evaluate('window.__audioContexts.at(-1).state'), 'running');
     await evaluate('document.querySelector("#music-volume").value=12;document.querySelector("#music-volume").dispatchEvent(new Event("input"))');
