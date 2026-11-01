@@ -1,10 +1,12 @@
-# André · Jacked & Tan 2.0
+# Repbase
 
-Aplicación estática en español para registrar **Jacked & Tan 2.0**, de Cody Lefever (GZCL), con navegación, superficies oscuras y colores por tier inspirados en Brute. Proyecto independiente: no contiene las marcas, el historial, las notas personales ni el despliegue de Brute.
+Repbase es una aplicación estática en español para registrar **Jacked & Tan 2.0**, de Cody Lefever (GZCL), con navegación, los cuatro temas de Brute y un nuevo tema Croissant. Proyecto independiente: no contiene las marcas, el historial, las notas personales ni el despliegue de Brute.
+
+Repositorio: [aatronco/repbase](https://github.com/aatronco/repbase).
 
 ## Fuente y alcance
 
-Fuente de prescripciones: la hoja **J&T2.0 KGS** del [compendio compartido por Alejandro](https://docs.google.com/spreadsheets/d/14ke22ZVdepbuSPrOI2ssNbxll9T8utr4co7OVv9W6oI/edit), exportada el 1 de noviembre de 2026. La identidad y SHA-256 de la exportación están en `source/jt-kgs-cells.json`. [Artículo original de Cody Lefever](https://swoleateveryheight.blogspot.com/2016/07/jacked-tan-20.html).
+Fuente de prescripciones: la hoja **J&T2.0 KGS** del [compendio de referencia](https://docs.google.com/spreadsheets/d/14ke22ZVdepbuSPrOI2ssNbxll9T8utr4co7OVv9W6oI/edit), exportada el 1 de noviembre de 2026. La identidad y SHA-256 de la exportación están en `source/jt-kgs-cells.json`. [Artículo original de Cody Lefever](https://swoleateveryheight.blogspot.com/2016/07/jacked-tan-20.html).
 
 La app transcribe las **12 semanas y los cuatro días programados**: 307 prescripciones de ejercicio, 60 fórmulas de carga con controles contra los resultados guardados del Excel, objetivos RM/MRS y descansos. El quinto día del archivo no tiene programa y no se inventa una sesión.
 
@@ -17,11 +19,11 @@ El artículo y la hoja no son idénticos. La hoja compartida gobierna las prescr
 - **TM:** campo editable independiente; la hoja lo define como una **2RM diaria estimada**, no una 1RM real. Los TM de los dos bloques son independientes.
 - **PR / 1RM real:** dato informativo, vacío al inicio. No se convierte automáticamente en TM.
 - **1RM estimada:** dato informativo separado. La calculadora Epley admite series de 1–10 repeticiones y no escribe al TM.
-- **RM diario:** lo ingresa André en cada sesión. Los backoffs T1 de semanas 7–11 usan 85% o 90% de ese RM. Un PR guardado no sustituye el RM del día.
+- **RM diario:** lo ingresal atleta en cada sesión. Los backoffs T1 de semanas 7–11 usan 85% o 90% de ese RM. Un PR guardado no sustituye el RM del día.
 - **T2b/c y T3:** encuentran el RM indicado y realizan las MRS adicionales con el mismo peso. Las cargas se registran, no se deducen de un PR.
 - **Redondeo:** múltiplo más cercano; 2,5 kg como en el Excel, configurable a 0,5/1/1,25/2,5/5 kg. Un TM ausente produce “Sin definir”, no cero.
 
-André escribe sus propios pesos. Los TM reales parten vacíos. El ejemplo opcional usa valores sintéticos, avisa antes de cargarlos, marca su fuente como ficticia y requiere Guardar marcas. No está vinculado a ninguna persona ni se presenta como una recomendación de carga.
+Cada atleta escribe sus propios pesos. Los TM reales parten vacíos. El ejemplo opcional usa valores sintéticos, avisa antes de cargarlos, marca su fuente como ficticia y requiere Guardar marcas. No está vinculado a ninguna persona ni se presenta como una recomendación de carga.
 
 ## Uso
 
@@ -40,7 +42,19 @@ Registro local, perfil en español, redondeo configurable, entrada por ruedas/to
 
 Las cargas programadas y las cargas realizadas son campos distintos: actualizar un TM cambia la recomendación, no lo que se registró. No se infiere una progresión automática entre ciclos. Los días se pueden distribuir en el calendario sin alterar el orden de las sesiones del Excel.
 
-No hay cuenta, backend, sincronización, analítica ni credenciales. Los datos viven en localStorage bajo `andre-jt2-v1`, separados de Brute. Borrar los datos del navegador puede borrarlos; exportar la copia es la protección. El modo sin conexión funciona después de una primera carga correcta mediante localhost o HTTPS.
+No hay cuenta, backend, sincronización, analítica ni credenciales. Los datos viven en localStorage bajo `jacked-and-tan-v1`, separados de Brute. Borrar los datos del navegador puede borrarlos; exportar la copia es la protección. El modo sin conexión funciona después de una primera carga correcta mediante localhost o HTTPS.
+
+## Temas y música
+
+El selector **Tema visual y musical** conserva Cyberpunk, Kawaii, Matrix y Brasil de Brute, con sus ambientes sintetizados. Sus paletas se adaptan a los componentes de Repbase y se ajustan los tonos de texto para mantener contraste legible. La elección del tema y el volumen se conservan al recargar.
+
+**Croissant** añade papel crema, café y dorado de mantequilla, títulos serif y el vals musette original **Miettes de dimanche**, en 3/4 a 108 BPM. La partitura propia de 16 compases combina melodía de acordeón sintetizado, bajo en el primer tiempo y acordes en el segundo y tercero. Se inspira en el ambiente de un café francés; no utiliza la melodía, letras, grabación ni samples de una canción existente.
+
+Los cuatro motores musicales de Brute y la composición original “Sol de treino” se reutilizan como código de síntesis. El nuevo vals vive en `js/croissant-score.js` y `js/croissant-audio.js`. Todo funciona con Web Audio, sin archivos remotos ni dependencias.
+
+La música requiere **Reproducir música**; nunca arranca automáticamente al cargar, recargar, cambiar de tema ni recuperar una pestaña. **Detener música** libera el contexto de audio; Silenciar y Volumen permiten ajustar la reproducción. Cambiar el tema o esconder/cerrar la pestaña detiene el audio. Navegar entre Programa, Mis marcas e Historial conserva la reproducción si la pestaña sigue visible. La animación del indicador respeta la preferencia de movimiento reducido.
+
+Los datos usan un identificador genérico estable. Si se detecta una sola copia válida de la versión inicial en el mismo navegador/origen, se copia completa al identificador actual sin borrar el original. Si hay varias candidatas, se solicita restaurar la copia elegida. Al cambiar de dispositivo u origen, utiliza la exportación JSON.
 
 ## Ejecutar y verificar
 
@@ -52,9 +66,9 @@ npm run serve
 # http://127.0.0.1:8787
 ```
 
-En macOS con Chrome instalado, `node scripts/smoke-browser.mjs` crea un servidor y un perfil temporal de Chrome, comprueba las 48 sesiones en 390 px, selectores con teclado y touch, confirmar/cancelar, cargas por RM, historial, corrupción y caché offline. Guarda capturas en `../andre-preview/`; detiene los procesos y elimina su perfil al terminar. No usa un perfil personal del navegador.
+En macOS con Chrome instalado, `node scripts/smoke-browser.mjs` crea un servidor y un perfil temporal de Chrome, comprueba las 48 sesiones en 390 px, selectores con teclado y touch, confirmar/cancelar, cargas por RM, historial, corrupción y caché offline; además verifica los cinco temas, contraste de texto y controles, música por gesto explícito, volumen/silencio/parada, persistencia, movimiento reducido y render de audio del vals original sin clipping. Guarda capturas en `../repbase-preview/`; detiene los procesos y elimina su perfil al terminar. No usa un perfil personal del navegador.
 
-`npm test` compara todos los ejercicios, RM, repeticiones y series con las celdas extraídas del archivo; contrasta las 60 fórmulas contra sus resultados originales; prueba máximos vacíos, cambios de TM, redondeo, RM, sustituciones, registros congelados y validación de copias. GitHub Actions ejecuta estas pruebas al recibir cambios. No configura hosting ni publicación.
+`npm test` compara todos los ejercicios, RM, repeticiones y series con las celdas extraídas del archivo; contrasta las 60 fórmulas contra sus resultados originales; prueba máximos vacíos, cambios de TM, redondeo, RM, sustituciones, registros congelados y validación de copias. GitHub Actions ejecuta estas pruebas al recibir cambios. El workflow `Publish Repbase` vuelve a comprobar las pruebas y publica los archivos estáticos mediante GitHub Pages en cada push a main.
 
 ## Regenerar la extracción
 
@@ -63,7 +77,7 @@ En macOS con Chrome instalado, `node scripts/smoke-browser.mjs` crea un servidor
 npm test
 ```
 
-El extractor usa solo la biblioteca estándar y lee la hoja KGS, conserva las fórmulas y referencias de celda, y separa los valores de ejemplo del autor en un fixture de pruebas. `source/jt-kgs-cells.json` conserva el texto y las fórmulas relevantes; los TM de ejemplo y las fechas antiguas se vacían. `tests/excel-fixture.json` contiene exclusivamente controles del archivo fuente, no marcas de André. El XLSX íntegro no se distribuye en este proyecto; permanece en el documento compartido y en la documentación del compendio de Brute.
+El extractor usa solo la biblioteca estándar y lee la hoja KGS, conserva las fórmulas y referencias de celda, y separa los valores de ejemplo del autor en un fixture de pruebas. `source/jt-kgs-cells.json` conserva el texto y las fórmulas relevantes; los TM de ejemplo y las fechas antiguas se vacían. `tests/excel-fixture.json` contiene exclusivamente controles del archivo fuente, no marcas del atleta. El XLSX íntegro no se distribuye en este proyecto; permanece en el documento compartido y en la documentación del compendio de Brute.
 
 ## Archivos
 
@@ -73,6 +87,9 @@ El extractor usa solo la biblioteca estándar y lee la hoja KGS, conserva las f�
 - `js/app.js`: interfaz y selectores accesibles.
 - `source/jt-kgs-cells.json`: celdas y fórmulas del programa con entradas iniciales vacías.
 - `tests/`: controles de fuente y comportamiento.
+- `css/themes.css`, `js/theme.js`: paletas y persistencia de los cinco temas.
+- `js/ambience.js`: controles musicales opcionales y gestión de contextos.
+- `js/croissant-score.js`, `js/croissant-audio.js`: partitura y síntesis originales del vals.
 - `sw.js`: precaché de archivos estáticos. Cambiar la versión de caché al modificar assets.
 
-Autoría del programa: Cody Lefever. Adaptación de interfaz: proyecto Brute de Alejandro; este repositorio no implica afiliación o aprobación del autor del programa. No se concede una licencia sobre el programa o el material original ajeno.
+Autoría del programa: Cody Lefever. Adaptación de interfaz: proyecto Brute; este repositorio no implica afiliación o aprobación del autor del programa. No se concede una licencia sobre el programa o el material original ajeno.

@@ -1,3 +1,5 @@
+import { initTheme } from './theme.js';
+import { initAmbience } from './ambience.js';
 import { workouts, source, positive, session, prescribedLoad, emptyState, estimate1RM, snapshot, completedErrors, validateState, mainSetCount } from './engine.js';
 import { readState, writeState, STORAGE_KEY } from './storage.js';
 const app = document.querySelector('#app');
@@ -22,14 +24,14 @@ function download(data, filename) {
   const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
   const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-const backup = () => download(storageFailed ? { recovery: true, raw: localStorage.getItem(STORAGE_KEY) } : state, 'andre-jt2-backup-' + new Date().toISOString().slice(0, 10) + '.json');
+const backup = () => download(storageFailed ? { recovery: true, raw: localStorage.getItem(STORAGE_KEY) } : state, 'repbase-backup-' + new Date().toISOString().slice(0, 10) + '.json');
 const kg = v => positive(v) ? v.toLocaleString('es-CL', { maximumFractionDigits: 3 }) + ' kg' : 'Sin definir';
 const weightButton = (id, value, label = 'Peso') => `<label>${esc(label)}<button type="button" class="weight-button" data-pick="${esc(id)}" data-value="${value ?? ''}" aria-label="${esc(label)}: ${esc(kg(value))}">${kg(value)} <span>AJUSTAR ↕</span></button></label>`;
 const repButtons = (id, field, count, text) => `<div class="rep-buttons">${Array.from({ length: count }, (_, i) => `<button type="button" class="secondary" data-pick="rep-${id}-${field}-${i}" data-value="${Number((text || '').split(',')[i]) || ''}" aria-label="Repeticiones serie ${i + 1}">S${i + 1}: ${esc((text || '').split(',')[i]?.trim() || '—')} ↕</button>`).join('')}</div>`;
 const title = (eyebrow, heading, text = '') => `<p class="eyebrow">${eyebrow}</p><h1>${esc(heading)}</h1>${text ? `<p class="intro">${text}</p>` : ''}`;
 function latest(w, d) { return state.history.filter(h => h.week === w && h.day === d).at(-1); }
 function renderHome() {
-  app.innerHTML = title('12 SEMANAS · 4 DÍAS · GZCL', 'Tu siguiente nivel, André.', 'Jacked & Tan 2.0, sesión por sesión. Define tus máximos de entrenamiento y registra el RM del día cuando el programa lo pida.') +
+  app.innerHTML = title('REPBASE · JACKED & TAN 2.0', 'Tu siguiente nivel.', 'Jacked & Tan 2.0, sesión por sesión. Define tus máximos de entrenamiento y registra el RM del día cuando el programa lo pida.') +
     (!Object.values(state.profile.maxes).some(m => positive(m.tm)) ? '<div class="notice">Empieza en <a href="#/setup">Mis marcas</a>. Los pesos están vacíos hasta que ingreses los tuyos. Puedes explorar todo el programa desde ahora.</div>' : '') +
     `<div class="weekbar"><div><p class="eyebrow">${week <= 6 ? 'BLOQUE 1 · BASE Y CAPACIDAD' : 'BLOQUE 2 · RM DEL DÍA'}</p><h2>${week === 6 || week === 12 ? 'Semana de pruebas' : 'Semana ' + week}</h2></div><label>Ver semana<select id="week">${Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}" ${week === i + 1 ? 'selected' : ''}>Semana ${i + 1}</option>`).join('')}</select></label></div><div class="grid">` +
     workouts.filter(w => w.week === week).map(w => `<a class="card session-link" href="#/workout/${week}/${w.day}"><div class="day-number">DÍA 0${w.day} · ${w.day % 2 ? 'TREN INFERIOR' : 'TREN SUPERIOR'}</div><h3>${esc(w.entries[0].exercise)}</h3><p class="muted">${w.entries[0].rm}RM del día · ${w.entries.length} ejercicios</p><span class="pill">${latest(week, w.day) ? 'Completada · ver registro' : Object.keys(state.drafts[week + '-' + w.day] || {}).length ? 'En curso' : 'Abrir sesión →'}</span></a>`).join('') + '</div><p class="muted">La plantilla conserva los cuatro días del Excel. El quinto día queda sin programar. Los descansos y sustituciones se ajustan a tu calendario.</p>';
@@ -49,12 +51,12 @@ function setup() {
   bindPickers((id, value) => { const key = id.slice(4); form.elements[key + '-tm'].value = value ?? ''; const b = form.querySelector(`[data-pick="${id}"]`); b.dataset.value = value ?? ''; b.innerHTML = `${kg(value)} <span>AJUSTAR ↕</span>`; });
   form.onsubmit = e => {
     e.preventDefault(); const data = new FormData(form); const next = structuredClone(state);
-    next.profile.name = data.get('name').trim() || 'André'; next.profile.startDate = data.get('startDate'); next.profile.increment = Number(data.get('increment'));
+    next.profile.name = data.get('name').trim() || 'Atleta'; next.profile.startDate = data.get('startDate'); next.profile.increment = Number(data.get('increment'));
     for (const m of source.maxes) for (const key of ['tm', 'real1RM', 'estimated1RM', 'date', 'source']) { const v = data.get(m.cell + '-' + key); next.profile.maxes[m.cell][key] = ['date', 'source'].includes(key) ? v : v === '' ? null : Number(v); }
     try { validateState(next); state = next; if (persist()) tell('Marcas guardadas. Tus registros anteriores se conservaron.'); } catch (error) { tell(error.message); }
   };
   document.querySelector('#demo').onclick = () => {
-    if (!confirm('Cargar valores FICTICIOS en el formulario. No son marcas de André. Se guardan solo con Guardar marcas.')) return;
+    if (!confirm('Cargar valores FICTICIOS en el formulario. No son marcas del atleta. Se guardan solo con Guardar marcas.')) return;
     source.maxes.forEach((m, i) => { const value = [90, 60, 110, 35, 45, 70][i % 6]; form.elements[m.cell + '-tm'].value = value; form.elements[m.cell + '-source'].value = 'EJEMPLO FICTICIO · reemplazar antes de entrenar'; const b = form.querySelector(`[data-pick="max-${m.cell}"]`); b.dataset.value = value; b.innerHTML = `${kg(value)} <span>DEMO ↕</span>`; });
     tell('Ejemplo ficticio cargado en el formulario. Reemplaza las marcas antes de entrenar.');
   };
@@ -122,7 +124,7 @@ function history() {
   }); bindBackup();
 }
 function guide() {
-  app.innerHTML = title('GUÍA DEL PROGRAMA', 'Entrena con intención.', 'La estructura y las excepciones provienen de la hoja J&T2.0 KGS del Excel que compartió Alejandro.') +
+  app.innerHTML = title('GUÍA DEL PROGRAMA', 'Entrena con intención.', 'La estructura y las excepciones provienen de la hoja J&T2.0 KGS del Excel de referencia.') +
     '<section class="card"><dl><dt>TM · máximo de entrenamiento</dt><dd>La hoja lo define como una 2RM diaria estimada. Los porcentajes del bloque 1 y de T2a usan el TM correspondiente. No uses automáticamente tu 1RM como TM.</dd><dt>RM del día</dt><dd>Encuentra el peso para las repeticiones indicadas. Regístralo en la sesión. En semanas 7–11, el trabajo posterior de T1 usa 85% o 90% de ese mismo peso.</dd><dt>MRS · series de máximas repeticiones</dt><dd>Encuentra el RM indicado y después realiza las MRS adicionales con ese peso. Deja 1–2 repeticiones en reserva. No se calcula su carga desde un PR.</dd><dt>+</dt><dd>La última serie permite un AMRAP si te encuentras bien. Es opcional. Mantén 1–2 repeticiones en reserva.</dd><dt>Descansos</dt><dd>T1: 3–5 minutos. T2: 2–3 minutos. Para los accesorios, la hoja imprime “T1: 60–90 segundos” en su última línea; el autor describe ese intervalo para T3.</dd><dt>Pruebas y segundo bloque</dt><dd>La semana 6 prueba los RM de T1 y descarga T2; T3 continúa según la hoja. La semana 12 vuelve a probar. Revisa manualmente los TM del segundo bloque después de las pruebas.</dd></dl></section>' +
     '<section class="card"><h2>Fidelidad al Excel</h2><p>Se conservan las 12 semanas, los cuatro días programados, la sentadilla frontal del primer bloque, el peso muerto del segundo, Sling Shot Bench adicional del día 4 y sus MRS, el T2a de piernas arriba con 4×10 en semanas 1–5 y los descansos por tier.</p><p>La app añade registro local, TM editables, redondeo configurable, sustituciones por sesión y copia JSON. El Excel usa múltiplos de 2,5 kg. La app no aplica subidas automáticas entre ciclos.</p><p>El nombre original de cada ejercicio permanece disponible en su referencia. Las sustituciones necesitan un TM propio cuando hay porcentajes.</p></section>' +
     `<section class="card"><h2>Fuente y autoría</h2><p>Jacked & Tan 2.0 por Cody Lefever (GZCL).</p><p><a href="${esc(source.url)}" target="_blank" rel="noopener">Excel compartido · J&T2.0 KGS</a></p><p><a href="https://swoleateveryheight.blogspot.com/2016/07/jacked-tan-20.html" target="_blank" rel="noopener">Artículo original del autor</a></p><p class="muted">Exportación verificada: ${source.exportedAt}. La app usa la hoja compartida cuando difiere de la explicación del artículo. Interfaz adaptada de Brute, sin sus datos personales.</p></section>`;
@@ -163,5 +165,6 @@ function route() {
   if (storageFailed) app.insertAdjacentHTML('afterbegin', '<div class="notice warning">No se pudieron leer los datos guardados. No se reemplazarán. Descarga tus datos anteriores desde Mis marcas antes de restaurar o reiniciar.</div>');
   window.scrollTo(0, 0);
 }
+initTheme(); initAmbience();
 window.addEventListener('hashchange', route); route();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => tell('El modo sin conexión no está disponible en este navegador.'));

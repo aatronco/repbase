@@ -21,7 +21,7 @@ export function prescribedLoad(prescription, profile, dailyRM = null, substituti
   return positive(base) ? roundLoad(base * prescription.percent, profile.increment) : null;
 }
 export function emptyState() {
-  return { version: 1, profile: { name: 'André', increment: 2.5, startDate: '', maxes: Object.fromEntries(source.maxes.map(m => [m.cell, { tm: null, real1RM: null, estimated1RM: null, date: '', source: '' }])), substitutions: {} }, drafts: {}, history: [] };
+  return { version: 1, profile: { name: 'Atleta', increment: 2.5, startDate: '', maxes: Object.fromEntries(source.maxes.map(m => [m.cell, { tm: null, real1RM: null, estimated1RM: null, date: '', source: '' }])), substitutions: {} }, drafts: {}, history: [] };
 }
 export function repList(value) {
   if (typeof value !== 'string' || !/^\s*\d+(\s*,\s*\d+)*\s*$/.test(value)) return null;
@@ -47,7 +47,7 @@ export function snapshot(state, workout, records, now = new Date().toISOString()
   return { id: globalThis.crypto.randomUUID(), week: workout.week, day: workout.day, completedAt: now, profile: structuredClone(state.profile), records: structuredClone(records), prescription: structuredClone(workout) };
 }
 export function validateState(value) {
-  const fail = () => { throw new Error('El archivo no es una copia válida de André J&T 2.0.'); };
+  const fail = () => { throw new Error('El archivo no es una copia válida de Repbase 2.0.'); };
   if (!value || value.version !== 1 || !value.profile || !Array.isArray(value.history) || !value.drafts || typeof value.drafts !== 'object' || Array.isArray(value.drafts)) fail();
   const p = value.profile;
   if (typeof p.name !== 'string' || p.name.length > 80 || !positive(p.increment) || p.increment > 25 || typeof p.startDate !== 'string' || !p.maxes || !p.substitutions) fail();

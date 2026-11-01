@@ -110,6 +110,22 @@ test('completion requires every actual set including MRS and backoffs', () => {
 });
 test('storage namespace isolation, malformed import protection, and history round trip', () => {
   const map = new Map([['brute-logs', 'untouched']]); const storage = { getItem: k => map.get(k), setItem: (k, v) => map.set(k, v) };
-  const s = emptyState(); writeState(s, storage); assert.deepEqual(readState(storage), s); assert.equal(map.get('brute-logs'), 'untouched'); assert.equal(STORAGE_KEY, 'andre-jt2-v1');
+  const s = emptyState(); writeState(s, storage); assert.deepEqual(readState(storage), s); assert.equal(map.get('brute-logs'), 'untouched'); assert.equal(STORAGE_KEY, 'jacked-and-tan-v1');
   for (const mutate of [s => s.profile.increment = 0, s => s.profile.maxes.E4.tm = -20, s => s.version = 2, s => s.history = {}, s => s.drafts['7-1'] = { AH57: { weight: 'evil' } }]) { const invalid = emptyState(); mutate(invalid); assert.throws(() => validateState(invalid)); }
+});
+test('branding migration retains complete prior logs and leaves original data intact', () => {
+  const prior = emptyState(); prior.profile.name = 'Atleta de prueba'; prior.profile.maxes.E4.tm = 100;
+  prior.drafts['7-1'] = { AH57: { weight: 90, reps: '6' } };
+  prior.history.push(snapshot(prior, session(12, 1), { BG57: { weight: 110, reps: '1' } }));
+  const raw = JSON.stringify(prior);
+  const map = new Map([['legacy-test-key', raw], ['unrelated-app', '{"counter":3}']]);
+  const storage = { get length() { return map.size; }, key: i => [...map.keys()][i], getItem: k => map.get(k), setItem: (k, v) => map.set(k, v) };
+  assert.deepEqual(readState(storage), prior);
+  assert.equal(map.get('legacy-test-key'), raw);
+  assert.equal(map.get('unrelated-app'), '{"counter":3}');
+  assert.deepEqual(JSON.parse(map.get(STORAGE_KEY)), prior);
+  assert.deepEqual(readState(storage).history, prior.history);
+  map.delete(STORAGE_KEY); map.set('second-legacy-key', raw);
+  assert.throws(() => readState(storage), /varias copias/);
+  assert.equal(map.has(STORAGE_KEY), false);
 });

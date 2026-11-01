@@ -1,1 +1,1 @@
-{"name":"jacked-and-tan-andre","version":"1.0.0","private":true,"type":"module","description":"Jacked & Tan 2.0 para André, basado en el compendio GZCL","scripts":{"test":"node --test tests/*.test.js","serve":"python3 -m http.server 8787 --bind 127.0.0.1"},"engines":{"node":">=20"}}
+{"name":"repbase","version":"1.0.0","private":true,"type":"module","description":"Jacked & Tan 2.0 para cada atleta, basado en el compendio GZCL","scripts":{"test":"node --test tests/*.test.js","serve":"python3 -m http.server 8787 --bind 127.0.0.1"},"engines":{"node":">=20"}}
