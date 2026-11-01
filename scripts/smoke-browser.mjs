@@ -6,7 +6,8 @@ import path from 'node:path';
 const root = path.resolve(new URL('..', import.meta.url).pathname);
 const artifacts = path.resolve(process.env.ARTIFACTS || path.join(root, '..', 'repbase-preview'));
 const profile = await mkdtemp(path.join(os.tmpdir(), 'repbase-browser-'));
-const server = spawn('/usr/bin/python3', ['-m', 'http.server', '8787', '--bind', '127.0.0.1'], { cwd: root, stdio: 'ignore' });
+const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:8787/';
+const server = process.env.BASE_URL ? null : spawn('/usr/bin/python3', ['-m', 'http.server', '8787', '--bind', '127.0.0.1'], { cwd: root, stdio: 'ignore' });
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', ['--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=9237', '--user-data-dir=' + profile, 'about:blank'], { stdio: 'ignore' });
 let ws; const errors = []; const wait = ms => new Promise(r => setTimeout(r, ms));
 try {
@@ -26,7 +27,7 @@ try {
   await mkdir(artifacts, { recursive: true });
   await send('Page.enable'); await send('Runtime.enable');
   await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
-  await send('Page.navigate', { url: 'http://127.0.0.1:8787/#/home' }); await until('document.querySelectorAll(".session-link").length===4');
+  await send('Page.navigate', { url: baseUrl + '#/home' }); await until('document.querySelectorAll(".session-link").length===4');
   assert.ok(await evaluate('document.documentElement.scrollWidth <= innerWidth'));
   assert.ok(await evaluate('document.body.innerText.includes("pesos están vacíos")'));
   await screenshot('repbase-programa-mobile.png');
@@ -158,5 +159,5 @@ try {
   assert.equal(errors.length, 0, errors.join('\n'));
   console.log('PASS: all 48 mobile sessions, keyboard and touch wheels, confirm/cancel, direct input, draft persistence, daily RM loads, completed history preservation, corruption protection, offline reload, five themes, contrast, original rendered waltz, music controls, no autoplay, reduced motion, screenshots.');
 } finally {
-  ws?.close(); chrome.kill('SIGTERM'); server.kill('SIGTERM'); await wait(500); await rm(profile, { recursive: true, force: true }).catch(() => {});
+  ws?.close(); chrome.kill('SIGTERM'); server?.kill('SIGTERM'); await wait(500); await rm(profile, { recursive: true, force: true }).catch(() => {});
 }

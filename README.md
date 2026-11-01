@@ -2,7 +2,7 @@
 
 Repbase es una aplicación estática en español para registrar **Jacked & Tan 2.0**, de Cody Lefever (GZCL), con navegación, los cuatro temas de Brute y un nuevo tema Croissant. Proyecto independiente: no contiene las marcas, el historial, las notas personales ni el despliegue de Brute.
 
-Repositorio: [aatronco/repbase](https://github.com/aatronco/repbase).
+App: [Repbase en GitHub Pages](https://aatronco.github.io/repbase/). Repositorio: [aatronco/repbase](https://github.com/aatronco/repbase).
 
 ## Fuente y alcance
 
@@ -66,7 +66,7 @@ npm run serve
 # http://127.0.0.1:8787
 ```
 
-En macOS con Chrome instalado, `node scripts/smoke-browser.mjs` crea un servidor y un perfil temporal de Chrome, comprueba las 48 sesiones en 390 px, selectores con teclado y touch, confirmar/cancelar, cargas por RM, historial, corrupción y caché offline; además verifica los cinco temas, contraste de texto y controles, música por gesto explícito, volumen/silencio/parada, persistencia, movimiento reducido y render de audio del vals original sin clipping. Guarda capturas en `../repbase-preview/`; detiene los procesos y elimina su perfil al terminar. No usa un perfil personal del navegador.
+En macOS con Chrome instalado, `node scripts/smoke-browser.mjs` crea un servidor y un perfil temporal de Chrome, comprueba las 48 sesiones en 390 px, selectores con teclado y touch, confirmar/cancelar, cargas por RM, historial, corrupción y caché offline; además verifica los cinco temas, contraste de texto y controles, música por gesto explícito, volumen/silencio/parada, persistencia, movimiento reducido y render de audio del vals original sin clipping. Guarda capturas en `../repbase-preview/`; detiene los procesos y elimina su perfil al terminar. No usa un perfil personal del navegador. Para repetir la comprobación contra una publicación, usar `BASE_URL=https://aatronco.github.io/repbase/ node scripts/smoke-browser.mjs`; en ese caso no inicia un servidor local.
 
 `npm test` compara todos los ejercicios, RM, repeticiones y series con las celdas extraídas del archivo; contrasta las 60 fórmulas contra sus resultados originales; prueba máximos vacíos, cambios de TM, redondeo, RM, sustituciones, registros congelados y validación de copias. GitHub Actions ejecuta estas pruebas al recibir cambios. El workflow `Publish Repbase` vuelve a comprobar las pruebas y publica los archivos estáticos mediante GitHub Pages en cada push a main.
 
