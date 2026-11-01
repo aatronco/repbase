@@ -1,0 +1,438 @@
+{
+  "maxes": {
+    "E4": 200.0,
+    "E5": 140.0,
+    "E6": 240.0,
+    "E7": 80.0,
+    "O4": 115.0,
+    "O5": 165.0,
+    "AI4": 210.0,
+    "AI5": 145.0,
+    "AI6": 258.0,
+    "AI7": 87.5,
+    "AS4": 122.5,
+    "AS5": 172.5
+  },
+  "loads": [
+    {
+      "week": 1,
+      "day": 1,
+      "id": "D57",
+      "backoff": true,
+      "expected": 140.0
+    },
+    {
+      "week": 1,
+      "day": 1,
+      "id": "D60",
+      "backoff": false,
+      "expected": 120.0
+    },
+    {
+      "week": 1,
+      "day": 2,
+      "id": "D69",
+      "backoff": true,
+      "expected": 90.0
+    },
+    {
+      "week": 1,
+      "day": 2,
+      "id": "D72",
+      "backoff": false,
+      "expected": 70.0
+    },
+    {
+      "week": 1,
+      "day": 3,
+      "id": "D81",
+      "backoff": true,
+      "expected": 115.0
+    },
+    {
+      "week": 1,
+      "day": 3,
+      "id": "D84",
+      "backoff": false,
+      "expected": 100.0
+    },
+    {
+      "week": 1,
+      "day": 4,
+      "id": "D93",
+      "backoff": true,
+      "expected": 47.5
+    },
+    {
+      "week": 1,
+      "day": 4,
+      "id": "D99",
+      "backoff": false,
+      "expected": 62.5
+    },
+    {
+      "week": 2,
+      "day": 1,
+      "id": "I57",
+      "backoff": true,
+      "expected": 150.0
+    },
+    {
+      "week": 2,
+      "day": 1,
+      "id": "I60",
+      "backoff": false,
+      "expected": 145.0
+    },
+    {
+      "week": 2,
+      "day": 2,
+      "id": "I69",
+      "backoff": true,
+      "expected": 97.5
+    },
+    {
+      "week": 2,
+      "day": 2,
+      "id": "I72",
+      "backoff": false,
+      "expected": 77.5
+    },
+    {
+      "week": 2,
+      "day": 3,
+      "id": "I81",
+      "backoff": true,
+      "expected": 125.0
+    },
+    {
+      "week": 2,
+      "day": 3,
+      "id": "I84",
+      "backoff": false,
+      "expected": 120.0
+    },
+    {
+      "week": 2,
+      "day": 4,
+      "id": "I93",
+      "backoff": true,
+      "expected": 52.5
+    },
+    {
+      "week": 2,
+      "day": 4,
+      "id": "I99",
+      "backoff": false,
+      "expected": 70.0
+    },
+    {
+      "week": 3,
+      "day": 1,
+      "id": "N57",
+      "backoff": true,
+      "expected": 160.0
+    },
+    {
+      "week": 3,
+      "day": 1,
+      "id": "N60",
+      "backoff": false,
+      "expected": 167.5
+    },
+    {
+      "week": 3,
+      "day": 2,
+      "id": "N69",
+      "backoff": true,
+      "expected": 105.0
+    },
+    {
+      "week": 3,
+      "day": 2,
+      "id": "N72",
+      "backoff": false,
+      "expected": 85.0
+    },
+    {
+      "week": 3,
+      "day": 3,
+      "id": "N81",
+      "backoff": true,
+      "expected": 132.5
+    },
+    {
+      "week": 3,
+      "day": 3,
+      "id": "N84",
+      "backoff": false,
+      "expected": 140.0
+    },
+    {
+      "week": 3,
+      "day": 4,
+      "id": "N93",
+      "backoff": true,
+      "expected": 55.0
+    },
+    {
+      "week": 3,
+      "day": 4,
+      "id": "N99",
+      "backoff": false,
+      "expected": 77.5
+    },
+    {
+      "week": 4,
+      "day": 1,
+      "id": "S57",
+      "backoff": true,
+      "expected": 165.0
+    },
+    {
+      "week": 4,
+      "day": 1,
+      "id": "S60",
+      "backoff": false,
+      "expected": 180.0
+    },
+    {
+      "week": 4,
+      "day": 2,
+      "id": "S69",
+      "backoff": true,
+      "expected": 107.5
+    },
+    {
+      "week": 4,
+      "day": 2,
+      "id": "S72",
+      "backoff": false,
+      "expected": 87.5
+    },
+    {
+      "week": 4,
+      "day": 3,
+      "id": "S81",
+      "backoff": true,
+      "expected": 135.0
+    },
+    {
+      "week": 4,
+      "day": 3,
+      "id": "S84",
+      "backoff": false,
+      "expected": 150.0
+    },
+    {
+      "week": 4,
+      "day": 4,
+      "id": "S93",
+      "backoff": true,
+      "expected": 62.5
+    },
+    {
+      "week": 4,
+      "day": 4,
+      "id": "S99",
+      "backoff": false,
+      "expected": 80.0
+    },
+    {
+      "week": 5,
+      "day": 1,
+      "id": "X57",
+      "backoff": true,
+      "expected": 170.0
+    },
+    {
+      "week": 5,
+      "day": 1,
+      "id": "X60",
+      "backoff": false,
+      "expected": 192.5
+    },
+    {
+      "week": 5,
+      "day": 2,
+      "id": "X69",
+      "backoff": true,
+      "expected": 112.5
+    },
+    {
+      "week": 5,
+      "day": 2,
+      "id": "X72",
+      "backoff": false,
+      "expected": 90.0
+    },
+    {
+      "week": 5,
+      "day": 3,
+      "id": "X81",
+      "backoff": true,
+      "expected": 140.0
+    },
+    {
+      "week": 5,
+      "day": 3,
+      "id": "X84",
+      "backoff": false,
+      "expected": 160.0
+    },
+    {
+      "week": 5,
+      "day": 4,
+      "id": "X93",
+      "backoff": true,
+      "expected": 65.0
+    },
+    {
+      "week": 5,
+      "day": 4,
+      "id": "X99",
+      "backoff": false,
+      "expected": 85.0
+    },
+    {
+      "week": 7,
+      "day": 1,
+      "id": "AH60",
+      "backoff": false,
+      "expected": 180.0
+    },
+    {
+      "week": 7,
+      "day": 2,
+      "id": "AH72",
+      "backoff": false,
+      "expected": 102.5
+    },
+    {
+      "week": 7,
+      "day": 3,
+      "id": "AH84",
+      "backoff": false,
+      "expected": 120.0
+    },
+    {
+      "week": 7,
+      "day": 4,
+      "id": "AH99",
+      "backoff": false,
+      "expected": 95.0
+    },
+    {
+      "week": 8,
+      "day": 1,
+      "id": "AM60",
+      "backoff": false,
+      "expected": 192.5
+    },
+    {
+      "week": 8,
+      "day": 2,
+      "id": "AM72",
+      "backoff": false,
+      "expected": 110.0
+    },
+    {
+      "week": 8,
+      "day": 3,
+      "id": "AM84",
+      "backoff": false,
+      "expected": 130.0
+    },
+    {
+      "week": 8,
+      "day": 4,
+      "id": "AM99",
+      "backoff": false,
+      "expected": 102.5
+    },
+    {
+      "week": 9,
+      "day": 1,
+      "id": "AR60",
+      "backoff": false,
+      "expected": 207.5
+    },
+    {
+      "week": 9,
+      "day": 2,
+      "id": "AR72",
+      "backoff": false,
+      "expected": 115.0
+    },
+    {
+      "week": 9,
+      "day": 3,
+      "id": "AR84",
+      "backoff": false,
+      "expected": 137.5
+    },
+    {
+      "week": 9,
+      "day": 4,
+      "id": "AR99",
+      "backoff": false,
+      "expected": 110.0
+    },
+    {
+      "week": 10,
+      "day": 1,
+      "id": "AW60",
+      "backoff": false,
+      "expected": 212.5
+    },
+    {
+      "week": 10,
+      "day": 2,
+      "id": "AW72",
+      "backoff": false,
+      "expected": 120.0
+    },
+    {
+      "week": 10,
+      "day": 3,
+      "id": "AW84",
+      "backoff": false,
+      "expected": 142.5
+    },
+    {
+      "week": 10,
+      "day": 4,
+      "id": "AW99",
+      "backoff": false,
+      "expected": 112.5
+    },
+    {
+      "week": 11,
+      "day": 1,
+      "id": "BB60",
+      "backoff": false,
+      "expected": 220.0
+    },
+    {
+      "week": 11,
+      "day": 2,
+      "id": "BB72",
+      "backoff": false,
+      "expected": 122.5
+    },
+    {
+      "week": 11,
+      "day": 3,
+      "id": "BB84",
+      "backoff": false,
+      "expected": 147.5
+    },
+    {
+      "week": 11,
+      "day": 4,
+      "id": "BB99",
+      "backoff": false,
+      "expected": 115.0
+    }
+  ]
+}
