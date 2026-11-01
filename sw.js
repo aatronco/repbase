@@ -1,4 +1,4 @@
-const CACHE = 'andre-jt2-v1';
+const CACHE = 'andre-jt2-v2';
 const FILES = ['./', './index.html', './css/app.css', './js/app.js', './js/engine.js', './js/program-data.js', './js/storage.js', './manifest.json', './icon.svg'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES))));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('andre-jt2-') && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));

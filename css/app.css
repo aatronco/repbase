@@ -3,3 +3,4 @@
 .rep-buttons{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 16px}.rep-buttons button{font-size:12px;min-width:55px;padding:8px}
 
 .weight-button{display:block;text-align:left;white-space:nowrap;font-size:16px;line-height:1.35}.weight-button span{display:block;font-size:10px;margin-top:4px;line-height:1.2}
+#wheel,button{-webkit-user-select:none;user-select:none}
