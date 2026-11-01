@@ -28,6 +28,7 @@ export function workoutGuidance(entry, profile) {
   if (mrs) {
     const additional = parseInt(entry.sets);
     result.next += ` Después haz ${additional} MRS: ${additional} ${additional === 1 ? 'serie adicional' : 'series adicionales'} con ese mismo peso, dejando 1–2 repeticiones en reserva. Registra ${sets} series en total; la primera es el ${rm}RM.`;
+    result.next += String(entry.tier).startsWith('1') ? ' Descanso T1: 3–5 minutos.' : ' Descansa 30–60 segundos entre la serie inicial y las MRS, y entre cada MRS.';
     const reps = Array.from({ length: sets }, (_, i) => Math.max(1, rm - i * 2));
     result.example = [`Si la primera serie fuera ${rm} repeticiones con 20 kg, mantendrías esos 20 kg para las ${additional} MRS.`, `Un registro ilustrativo de las ${sets} series sería: ${reps.join(', ')} repeticiones. Es normal que bajen con la fatiga; no son objetivos fijos para las MRS.`];
   } else if (entry.backoff) {

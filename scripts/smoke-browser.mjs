@@ -14,13 +14,14 @@ try {
   let targets;
   for (let i = 0; i < 100; i++) { try { targets = await (await fetch('http://127.0.0.1:9237/json')).json(); break; } catch { await wait(100); } }
   assert.ok(targets, 'Chrome debugging startup');
+  if (server) { let ready=false; const deadline=Date.now()+20000; while(Date.now()<deadline){try{const response=await fetch(baseUrl,{signal:AbortSignal.timeout(1000)});if(response.ok){ready=true;break;}}catch{}await wait(100);}assert.ok(ready,'local server startup'); }
   ws = new WebSocket(targets.find(t => t.type === 'page').webSocketDebuggerUrl);
   await new Promise((r, j) => { ws.addEventListener('open', r, { once: true }); ws.addEventListener('error', j, { once: true }); });
   let nextId = 0; const pending = new Map();
   ws.addEventListener('message', event => { const m = JSON.parse(event.data); if (m.id) { const p = pending.get(m.id); pending.delete(m.id); m.error ? p.reject(new Error(JSON.stringify(m.error))) : p.resolve(m.result); } if (m.method === 'Runtime.exceptionThrown') errors.push(m.params.exceptionDetails.text); });
   const send = (method, params = {}) => new Promise((resolve, reject) => { const id = ++nextId; pending.set(id, { resolve, reject }); ws.send(JSON.stringify({ id, method, params })); });
   const evaluate = async expression => { const r = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true, userGesture: true }); if (r.exceptionDetails) throw new Error(JSON.stringify(r.exceptionDetails)); return r.result.value; };
-  const until = async expression => { for (let i = 0; i < 100; i++) { if (await evaluate(expression)) return; await wait(50); } throw new Error('Timeout: ' + expression); };
+  const until = async expression => { for (let i = 0; i < 200; i++) { if (await evaluate(expression)) return; await wait(100); } throw new Error('Timeout: ' + expression); };
   const tap = async selector => { const point = await evaluate(`(()=>{const el=document.querySelector(${JSON.stringify(selector)});el.scrollIntoView({block:'center'});const r=el.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`); await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] }); await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await wait(50); };
   const go = async hash => { await evaluate(`location.hash=${JSON.stringify(hash)}`); await wait(80); };
   const screenshot = async name => writeFile(path.join(artifacts, name), Buffer.from((await send('Page.captureScreenshot', { format: 'png' })).data, 'base64'));
@@ -42,8 +43,12 @@ try {
   await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'ArrowDown', code: 'ArrowDown' });
   await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'ArrowDown', code: 'ArrowDown' });
   assert.ok(await evaluate('document.querySelector("#wheel [aria-selected=true]") !== null'));
-  await evaluate('document.querySelector("#picker-number").value=100'); await tap('#picker-confirm');
-  assert.equal(await evaluate('document.querySelector("[name=E4-tm]").value'), '100');
+  await evaluate('document.querySelector("#picker-number").value=100;document.querySelector("#picker-number").focus()');
+  await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+  await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+  await until('!document.querySelector("#picker").open');
+  await until('document.querySelector("[name=E4-tm]").value==="100"');
+  assert.equal(await evaluate('document.querySelector("[name=E4-tm]").value'), '100','Enter confirms direct input');
   await evaluate('document.querySelector("#setup").requestSubmit()');
   assert.equal(await evaluate('JSON.parse(localStorage.getItem("jacked-and-tan-v1")).profile.maxes.E4.tm'), 100);
   assert.ok(await evaluate('document.documentElement.scrollWidth <= innerWidth'));
@@ -54,6 +59,18 @@ try {
   assert.equal(await evaluate('document.querySelector("#picker-number").max'), '100');
   await evaluate('document.querySelector("#picker-number").value=10'); await tap('#picker-confirm');
   assert.equal(await evaluate('document.querySelector("[data-record=D57][data-field=reps]").value'), '10');
+  await evaluate('document.querySelector("[data-record=D57][data-field=reps]").value="11";document.querySelector("[data-record=D57][data-field=reps]").dispatchEvent(new Event("input"));document.querySelector("[data-record=D57][data-field=reps]").dispatchEvent(new Event("change"))');
+  assert.equal(await evaluate('document.querySelector("[data-pick=rep-D57-reps-0]").dataset.value'),'11','typed reps update wheel starting value');
+  assert.ok(await evaluate('document.querySelector("[data-pick=rep-D57-reps-0]").textContent.includes("11")'));
+  await tap('[data-pick="rep-D57-reps-0"]');
+  assert.equal(await evaluate('document.querySelector("#picker-number").value'),'11');
+  await evaluate('document.querySelector("#picker-number").value=10'); await tap('#picker-confirm');
+  await evaluate('document.querySelector("[data-record=D57][data-field=backoffReps]").value="6,6,8";document.querySelector("[data-record=D57][data-field=backoffReps]").dispatchEvent(new Event("input"));document.querySelector("[data-record=D57][data-field=backoffReps]").dispatchEvent(new Event("change"))');
+  assert.equal(await evaluate('document.querySelector("[data-pick=rep-D57-backoffReps-2]").dataset.value'),'8');
+  await tap('[data-pick="rep-D57-backoffReps-2"]');
+  assert.equal(await evaluate('document.querySelector("#picker-number").value'),'8');
+  await tap('#picker button[value="cancel"]');
+
   await evaluate('window.scrollTo(0,0);document.querySelector("#status").classList.remove("visible")');
   await screenshot('repbase-sesion-mobile.png');
   await tap('[data-pick="D57-weight"]'); await screenshot('repbase-selector-mobile.png'); await tap('#picker button[value="cancel"]');

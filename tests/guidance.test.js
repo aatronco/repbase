@@ -51,3 +51,11 @@ test('all 307 contextual guides preserve source data and profile/history', () =>
   }
   assert.equal(JSON.stringify(state), before); assert.equal(JSON.stringify(workouts), sourceBefore);
 });
+test('MRS-specific rest is distinguished from the T1 additional MRS variation', () => {
+  const p = emptyState().profile;
+  assert.match(workoutGuidance(session(1, 1).entries[2], p).next, /30–60 segundos/);
+  const t3 = session(1, 1).entries.find(e => String(e.tier).startsWith('3'));
+  assert.match(workoutGuidance(t3, p).next, /30–60 segundos/);
+  const t1 = workoutGuidance(session(1, 4).entries[1], p).next;
+  assert.match(t1, /3–5 minutos/); assert.doesNotMatch(t1, /30–60/);
+});
