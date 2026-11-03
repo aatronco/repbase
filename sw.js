@@ -1,4 +1,4 @@
-const CACHE = 'repbase-v6';
+const CACHE = 'repbase-v7';
 const FILES = ['./', './index.html', './css/app.css', './css/themes.css', './js/theme.js', './js/ambience.js', './js/audio-engine.js', './js/brasil-audio.js', './js/brasil-score.js', './js/croissant-audio.js', './js/croissant-score.js', './js/app.js', './js/workout-guidance.js', './js/engine.js', './js/program-data.js', './js/storage.js', './manifest.json', './icon.svg'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES))));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('repbase-') && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
